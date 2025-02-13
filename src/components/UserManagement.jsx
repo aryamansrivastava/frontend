@@ -38,7 +38,7 @@ const UserManagement = () => {
         await updateUser(editingUser.id, formData);
         toast.success("User updated successfully! ✅");
       } else {
-        const response = await createUser(formData);
+        await createUser(formData);
         toast.success("User created successfully! 🎉");
       }
       setFormData({ firstName: "", lastName: "", email: "", password: "" });
@@ -47,6 +47,22 @@ const UserManagement = () => {
     } catch (error) {
       toast.error("Error saving user ❌");
       console.error("Error saving user:", error.response ? error.response.data : error);
+    }
+  };
+
+  const handleCancel = () => {
+    setFormData({ firstName: "", lastName: "", email: "", password: "" });
+    setEditingUser(null);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await deleteUser(id);
+      toast.success("User deleted successfully! ✅");
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+    } catch (error) {
+      toast.error("Error deleting user ❌");
+      console.error("Error deleting user:", error.response ? error.response.data : error);
     }
   };
 
@@ -100,6 +116,15 @@ const UserManagement = () => {
           >
             {editingUser ? "Update" : "Create"}
           </button>
+          {editingUser && (
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-gray-500 p-2 rounded text-white hover:bg-gray-600 transition duration-300 w-full"
+            >
+              Cancel
+            </button>
+          )}
         </form>
       </div>
 
@@ -132,14 +157,23 @@ const UserManagement = () => {
                       onClick={() => setEditingUser(user)}
                       className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
                     >
-                      Edit
+                      {editingUser && editingUser.id === user.id ? "Editing" : "Edit"}
                     </button>
-                    <button
-                      onClick={() => deleteUser(user.id)}
-                      className="bg-red-500 p-1 rounded text-white hover:bg-red-600 transition duration-300"
-                    >
-                      Delete
-                    </button>
+                    {editingUser && editingUser.id === user.id ? (
+                      <button
+                        onClick={handleCancel}
+                        className="bg-gray-500 p-1 rounded text-white hover:bg-gray-600 transition duration-300"
+                      >
+                        Cancel
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => handleDelete(user.id)}
+                        className="bg-red-500 p-1 rounded text-white hover:bg-red-600 transition duration-300"
+                      >
+                        Delete
+                      </button>
+                    )}
                   </td>
                 </tr>
               ))}
