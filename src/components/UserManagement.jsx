@@ -46,7 +46,10 @@ const UserManagement = () => {
       fetchUsers();
     } catch (error) {
       toast.error("Error saving user ❌");
-      console.error("Error saving user:", error.response ? error.response.data : error);
+      console.error(
+        "Error saving user:",
+        error.response ? error.response.data : error
+      );
     }
   };
 
@@ -62,7 +65,10 @@ const UserManagement = () => {
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
       toast.error("Error deleting user ❌");
-      console.error("Error deleting user:", error.response ? error.response.data : error);
+      console.error(
+        "Error deleting user:",
+        error.response ? error.response.data : error
+      );
     }
   };
 
@@ -149,16 +155,32 @@ const UserManagement = () => {
             </thead>
             <tbody>
               {users.map((user) => (
-                <tr key={user.id} className="border-b border-gray-700 text-center">
-                  <td className="p-2">{user.firstName} {user.lastName}</td>
+                <tr
+                  key={user.id}
+                  className="border-b border-gray-700 text-center"
+                >
+                  <td className="p-2">
+                    {user.firstName} {user.lastName}
+                  </td>
                   <td className="p-2">{user.email}</td>
                   <td className="p-2 flex justify-center gap-2">
                     <button
-                      onClick={() => setEditingUser(user)}
+                      onClick={() => {
+                        setEditingUser(user);
+                        setFormData({
+                          firstName: user.firstName,
+                          lastName: user.lastName,
+                          email: user.email,
+                          password: "",
+                        });
+                      }}
                       className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
                     >
-                      {editingUser && editingUser.id === user.id ? "Editing" : "Edit"}
+                      {editingUser && editingUser.id === user.id
+                        ? "Editing"
+                        : "Edit"}
                     </button>
+
                     {editingUser && editingUser.id === user.id ? (
                       <button
                         onClick={handleCancel}
