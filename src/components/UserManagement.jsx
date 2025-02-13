@@ -43,19 +43,18 @@ const UserManagement = () => {
       }
       setFormData({ firstName: "", lastName: "", email: "", password: "" });
       setEditingUser(null);
+      setShowUsers(false); // Keep users hidden after editing
       fetchUsers();
     } catch (error) {
       toast.error("Error saving user ❌");
-      console.error(
-        "Error saving user:",
-        error.response ? error.response.data : error
-      );
+      console.error("Error saving user:", error.response ? error.response.data : error);
     }
   };
 
   const handleCancel = () => {
     setFormData({ firstName: "", lastName: "", email: "", password: "" });
     setEditingUser(null);
+    setShowUsers(true); // Show users list when canceling edit mode
   };
 
   const handleDelete = async (id) => {
@@ -65,10 +64,7 @@ const UserManagement = () => {
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
       toast.error("Error deleting user ❌");
-      console.error(
-        "Error deleting user:",
-        error.response ? error.response.data : error
-      );
+      console.error("Error deleting user:", error.response ? error.response.data : error);
     }
   };
 
@@ -78,7 +74,7 @@ const UserManagement = () => {
 
       <h1 className="text-3xl font-bold mb-5 text-center">CRUD Sequelize</h1>
 
-      {/* User Form */}
+      {/* User Form - Always Visible */}
       <div className="mb-5 bg-gray-800 p-5 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">
           {editingUser ? "Edit User" : "Create User"}
@@ -134,74 +130,62 @@ const UserManagement = () => {
         </form>
       </div>
 
-      {/* User List */}
-      <h2 className="text-xl mb-3">Users Created: {users.length}</h2>
-      <button
-        onClick={() => setShowUsers(!showUsers)}
-        className="bg-green-500 p-2 rounded text-white hover:bg-green-600 transition duration-300"
-      >
-        {showUsers ? "Hide Users" : "View All Users"}
-      </button>
+      {/* User List - Hidden When Editing */}
+      {!editingUser && (
+        <>
+          <h2 className="text-xl mb-3">Users Created: {users.length}</h2>
+          <button
+            onClick={() => setShowUsers(!showUsers)}
+            className="bg-green-500 p-2 rounded text-white hover:bg-green-600 transition duration-300"
+          >
+            {showUsers ? "Hide Users" : "View All Users"}
+          </button>
 
-      {showUsers && (
-        <div className="overflow-x-auto w-full max-w-4xl mt-5">
-          <table className="w-full bg-gray-800 border border-gray-700 rounded-lg">
-            <thead>
-              <tr className="bg-gray-700">
-                <th className="border p-2">Name</th>
-                <th className="border p-2">Email</th>
-                <th className="border p-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {users.map((user) => (
-                <tr
-                  key={user.id}
-                  className="border-b border-gray-700 text-center"
-                >
-                  <td className="p-2">
-                    {user.firstName} {user.lastName}
-                  </td>
-                  <td className="p-2">{user.email}</td>
-                  <td className="p-2 flex justify-center gap-2">
-                    <button
-                      onClick={() => {
-                        setEditingUser(user);
-                        setFormData({
-                          firstName: user.firstName,
-                          lastName: user.lastName,
-                          email: user.email,
-                          password: "",
-                        });
-                      }}
-                      className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
-                    >
-                      {editingUser && editingUser.id === user.id
-                        ? "Editing"
-                        : "Edit"}
-                    </button>
-
-                    {editingUser && editingUser.id === user.id ? (
-                      <button
-                        onClick={handleCancel}
-                        className="bg-gray-500 p-1 rounded text-white hover:bg-gray-600 transition duration-300"
-                      >
-                        Cancel
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => handleDelete(user.id)}
-                        className="bg-red-500 p-1 rounded text-white hover:bg-red-600 transition duration-300"
-                      >
-                        Delete
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+          {showUsers && (
+            <div className="overflow-x-auto w-full max-w-4xl mt-5">
+              <table className="w-full bg-gray-800 border border-gray-700 rounded-lg">
+                <thead>
+                  <tr className="bg-gray-700">
+                    <th className="border p-2">Name</th>
+                    <th className="border p-2">Email</th>
+                    <th className="border p-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users.map((user) => (
+                    <tr key={user.id} className="border-b border-gray-700 text-center">
+                      <td className="p-2">{user.firstName} {user.lastName}</td>
+                      <td className="p-2">{user.email}</td>
+                      <td className="p-2 flex justify-center gap-2">
+                        <button
+                          onClick={() => {
+                            setEditingUser(user);
+                            setFormData({
+                              firstName: user.firstName,
+                              lastName: user.lastName,
+                              email: user.email,
+                              password: "", // Do not prefill password
+                            });
+                            setShowUsers(false); // Hide the user list when editing
+                          }}
+                          className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user.id)}
+                          className="bg-red-500 p-1 rounded text-white hover:bg-red-600 transition duration-300"
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
