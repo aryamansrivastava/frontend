@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { getUsers, deleteUser } from "../api/api";
 import { toast } from "react-toastify";
+
+const toastStyle = {
+  userSelect: 'none', 
+};
 
 const UserList = ({ onEdit }) => {
   const [users, setUsers] = useState([]);
@@ -16,7 +20,9 @@ const UserList = ({ onEdit }) => {
       setUsers(data);
     } catch (error) {
       console.error("Error fetching users:", error);
-      toast.error("Failed to load users ❌");
+      toast.error("Failed to load users ❌", {
+        style: toastStyle, 
+      });
     }
   };
 
@@ -39,17 +45,23 @@ const UserList = ({ onEdit }) => {
       
       const userExists = users.find(user => user.id === userId);
       if (!userExists) {
-        toast.error("User not found! ❌");
+        toast.error("User not found! ❌", {
+          style: toastStyle, 
+        });
         return;
       }
 
       await deleteUser(userId);
-      toast.success("User deleted successfully! 🗑️");
+      toast.success("User deleted successfully! 🗑️", {
+        style: toastStyle, 
+      });
 
       setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
     } catch (error) {
       console.error("Error deleting user:", error.response ? error.response.data : error);
-      toast.error(error.response?.data?.message || "Error deleting user ❌");
+      toast.error(error.response?.data?.message || "Error deleting user ❌", {
+        style: toastStyle, 
+      });
     }
   };
 

@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { createUser, getAllUsers, deleteUser, updateUser } from "../api/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useNavigate } from "react-router-dom";
 
-const UserManagement = () => {
+const toastStyle = {
+  userSelect: 'none', 
+};
+
+const UserManagement = ({setToken}) => {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
   const [formData, setFormData] = useState({
@@ -12,7 +17,9 @@ const UserManagement = () => {
     email: "",
     password: "",
   });
+
   const [editingUser, setEditingUser] = useState(null);
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
@@ -36,17 +43,23 @@ const UserManagement = () => {
     try {
       if (editingUser) {
         await updateUser(editingUser.id, formData);
-        toast.success("User updated successfully! ✅");
+        toast.success("User updated successfully! ✅", {
+          style: toastStyle, 
+        });
       } else {
         await createUser(formData);
-        toast.success("User created successfully! 🎉");
+        toast.success("Signed In successfully! 🎉", {
+          style: toastStyle, 
+        });
       }
       setFormData({ firstName: "", lastName: "", email: "", password: "" });
       setEditingUser(null);
-      setShowUsers(false); // Keep users hidden after editing
+      setShowUsers(false); 
       fetchUsers();
     } catch (error) {
-      toast.error("Error saving user ❌");
+      toast.error("Error saving user ❌", {
+        style: toastStyle, 
+      });
       console.error("Error saving user:", error.response ? error.response.data : error);
     }
   };
@@ -60,21 +73,37 @@ const UserManagement = () => {
   const handleDelete = async (id) => {
     try {
       await deleteUser(id);
-      toast.success("User deleted successfully! ✅");
+      toast.success("User deleted successfully! ✅", {
+        style: toastStyle, 
+      });
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
-      toast.error("Error deleting user ❌");
+      toast.error("Error deleting user ❌", {
+        style: toastStyle, 
+      });
       console.error("Error deleting user:", error.response ? error.response.data : error);
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setToken(null);
+    navigate("/login");
+  };
+
   return (
-    <div className="p-5 bg-gray-900 text-white min-h-screen flex flex-col items-center">
+    <div className="relative p-5 bg-gray-900 text-white min-h-screen flex flex-col items-center pt-20">
       <ToastContainer position="top-right" autoClose={3000} />
+      
+      <button
+        onClick={handleLogout}
+        className="absolute top-5 right-5 bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
+      >
+        Logout
+      </button>
 
       <h1 className="text-3xl font-bold mb-5 text-center">CRUD Sequelize</h1>
 
-      {/* User Form - Always Visible */}
       <div className="mb-5 bg-gray-800 p-5 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">
           {editingUser ? "Edit User" : "Create User"}
@@ -116,7 +145,7 @@ const UserManagement = () => {
             type="submit"
             className="bg-blue-500 p-2 rounded text-white hover:bg-blue-600 transition duration-300 w-full"
           >
-            {editingUser ? "Update" : "Create"}
+            {editingUser ? "Update" : "Create User"}
           </button>
           {editingUser && (
             <button
@@ -164,9 +193,9 @@ const UserManagement = () => {
                               firstName: user.firstName,
                               lastName: user.lastName,
                               email: user.email,
-                              password: "", // Do not prefill password
+                              password: "", 
                             });
-                            setShowUsers(false); // Hide the user list when editing
+                            setShowUsers(false); 
                           }}
                           className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
                         >
