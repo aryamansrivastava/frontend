@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 const toastStyle = { userSelect: "none" };
 
+// eslint-disable-next-line react/prop-types
 const UserManagement = ({ setToken }) => {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
@@ -13,7 +14,7 @@ const UserManagement = ({ setToken }) => {
   const navigate = useNavigate();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const usersPerPage = 5; // Number of users per page
+  const usersPerPage = 4;
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -87,7 +88,6 @@ const UserManagement = ({ setToken }) => {
     navigate("/login");
   };
 
-  // Pagination Logic
   const indexOfLastUser = currentPage * usersPerPage;
   const indexOfFirstUser = indexOfLastUser - usersPerPage;
   const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
@@ -98,16 +98,21 @@ const UserManagement = ({ setToken }) => {
     <div className="relative p-5 bg-gray-900 text-white min-h-screen flex flex-col items-center pt-20">
       <ToastContainer position="top-right" autoClose={3000} />
 
-      <button
-        onClick={handleLogout}
-        className="absolute top-5 right-5 bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
-      >
-        Logout
-      </button>
+      <div className="absolute top-5 right-5 flex flex-col items-end">
+  <div className="text-white font-semibold mb-1">
+    Welcome, {localStorage.getItem("loggedInUser")}
+  </div>
+  <button
+    onClick={handleLogout}
+    className="bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
+  >
+    Logout
+  </button>
+</div>
+
 
       <h1 className="text-3xl font-bold mb-5 text-center">CRUD Sequelize</h1>
 
-      {/* Form for Creating / Editing Users */}
       <div className="mb-5 bg-gray-800 p-5 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">
           {editingUser ? "Edit User" : "Create User"}
@@ -163,7 +168,6 @@ const UserManagement = ({ setToken }) => {
         </form>
       </div>
 
-      {/* User List with Pagination */}
       {!editingUser && (
         <>
           <h2 className="text-xl mb-3">Users Created: {users.length}</h2>
@@ -222,7 +226,6 @@ const UserManagement = ({ setToken }) => {
                 </tbody>
               </table>
 
-              {/* Pagination Controls */}
               <div className="flex justify-center mt-4">
                 <button
                   onClick={() =>

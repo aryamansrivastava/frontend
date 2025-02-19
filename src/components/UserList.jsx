@@ -6,6 +6,7 @@ const toastStyle = {
   userSelect: 'none', 
 };
 
+// eslint-disable-next-line react/prop-types
 const UserList = ({ onEdit }) => {
   const [users, setUsers] = useState([]);
   const [editingUserId, setEditingUserId] = useState(null);

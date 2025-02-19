@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { createUser, updateUser } from "../api/api";
 
+// eslint-disable-next-line react/prop-types
 const UserForm = ({ user, onSave }) => {
   const [formData, setFormData] = useState({
     firstName: "",
