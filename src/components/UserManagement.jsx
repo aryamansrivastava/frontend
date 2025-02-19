@@ -4,13 +4,17 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 
-const toastStyle = {
-  userSelect: 'none', 
-};
+const toastStyle = { userSelect: "none" };
 
-const UserManagement = ({setToken}) => {
+const UserManagement = ({ setToken }) => {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const navigate = useNavigate();
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const usersPerPage = 5; // Number of users per page
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,8 +22,9 @@ const UserManagement = ({setToken}) => {
     password: "",
   });
 
-  const [editingUser, setEditingUser] = useState(null);
-  const navigate = useNavigate();
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -30,58 +35,49 @@ const UserManagement = ({setToken}) => {
     }
   };
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (editingUser) {
         await updateUser(editingUser.id, formData);
-        toast.success("User updated successfully! ✅", {
-          style: toastStyle, 
-        });
+        toast.success("User updated successfully! ✅", { style: toastStyle });
       } else {
         await createUser(formData);
-        toast.success("Signed In successfully! 🎉", {
-          style: toastStyle, 
-        });
+        toast.success("Signed In successfully! 🎉", { style: toastStyle });
       }
       setFormData({ firstName: "", lastName: "", email: "", password: "" });
       setEditingUser(null);
-      setShowUsers(false); 
+      setShowUsers(false);
       fetchUsers();
     } catch (error) {
-      toast.error("Error saving user ❌", {
-        style: toastStyle, 
-      });
-      console.error("Error saving user:", error.response ? error.response.data : error);
+      toast.error("Error saving user ❌", { style: toastStyle });
+      console.error(
+        "Error saving user:",
+        error.response ? error.response.data : error
+      );
     }
   };
 
   const handleCancel = () => {
     setFormData({ firstName: "", lastName: "", email: "", password: "" });
     setEditingUser(null);
-    setShowUsers(true); // Show users list when canceling edit mode
+    setShowUsers(true);
   };
 
   const handleDelete = async (id) => {
     try {
       await deleteUser(id);
-      toast.success("User deleted successfully! ✅", {
-        style: toastStyle, 
-      });
+      toast.success("User deleted successfully! ✅", { style: toastStyle });
       setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
     } catch (error) {
-      toast.error("Error deleting user ❌", {
-        style: toastStyle, 
-      });
-      console.error("Error deleting user:", error.response ? error.response.data : error);
+      toast.error("Error deleting user ❌", { style: toastStyle });
+      console.error(
+        "Error deleting user:",
+        error.response ? error.response.data : error
+      );
     }
   };
 
@@ -91,10 +87,17 @@ const UserManagement = ({setToken}) => {
     navigate("/login");
   };
 
+  // Pagination Logic
+  const indexOfLastUser = currentPage * usersPerPage;
+  const indexOfFirstUser = indexOfLastUser - usersPerPage;
+  const currentUsers = users.slice(indexOfFirstUser, indexOfLastUser);
+
+  const totalPages = Math.ceil(users.length / usersPerPage);
+
   return (
     <div className="relative p-5 bg-gray-900 text-white min-h-screen flex flex-col items-center pt-20">
       <ToastContainer position="top-right" autoClose={3000} />
-      
+
       <button
         onClick={handleLogout}
         className="absolute top-5 right-5 bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
@@ -104,6 +107,7 @@ const UserManagement = ({setToken}) => {
 
       <h1 className="text-3xl font-bold mb-5 text-center">CRUD Sequelize</h1>
 
+      {/* Form for Creating / Editing Users */}
       <div className="mb-5 bg-gray-800 p-5 rounded-lg shadow-lg w-full max-w-lg">
         <h2 className="text-xl font-semibold mb-4 text-center">
           {editingUser ? "Edit User" : "Create User"}
@@ -159,7 +163,7 @@ const UserManagement = ({setToken}) => {
         </form>
       </div>
 
-      {/* User List - Hidden When Editing */}
+      {/* User List with Pagination */}
       {!editingUser && (
         <>
           <h2 className="text-xl mb-3">Users Created: {users.length}</h2>
@@ -181,9 +185,14 @@ const UserManagement = ({setToken}) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((user) => (
-                    <tr key={user.id} className="border-b border-gray-700 text-center">
-                      <td className="p-2">{user.firstName} {user.lastName}</td>
+                  {currentUsers.map((user) => (
+                    <tr
+                      key={user.id}
+                      className="border-b border-gray-700 text-center"
+                    >
+                      <td className="p-2">
+                        {user.firstName} {user.lastName}
+                      </td>
                       <td className="p-2">{user.email}</td>
                       <td className="p-2 flex justify-center gap-2">
                         <button
@@ -193,9 +202,9 @@ const UserManagement = ({setToken}) => {
                               firstName: user.firstName,
                               lastName: user.lastName,
                               email: user.email,
-                              password: "", 
+                              password: "",
                             });
-                            setShowUsers(false); 
+                            setShowUsers(false);
                           }}
                           className="bg-yellow-500 p-1 rounded text-black hover:bg-yellow-600 transition duration-300"
                         >
@@ -212,6 +221,28 @@ const UserManagement = ({setToken}) => {
                   ))}
                 </tbody>
               </table>
+
+              {/* Pagination Controls */}
+              <div className="flex justify-center mt-4">
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={currentPage === 1}
+                  className="px-4 py-2 bg-gray-600 text-white rounded mr-2 disabled:opacity-50"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() =>
+                    setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                  }
+                  disabled={currentPage === totalPages}
+                  className="px-4 py-2 bg-gray-600 text-white rounded"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </>
