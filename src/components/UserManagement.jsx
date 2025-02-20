@@ -3,11 +3,11 @@ import { createUser, getAllUsers, deleteUser, updateUser } from "../api/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import PropTypes from 'prop-types';
 
 const toastStyle = { userSelect: "none" };
 
-// eslint-disable-next-line react/prop-types
-const UserManagement = ({ setToken }) => {
+const UserManagement = ({setToken}) => {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -22,6 +22,10 @@ const UserManagement = ({ setToken }) => {
     email: "",
     password: "",
   });
+
+  useEffect(() => {
+    setToken(sessionStorage.getItem('token'))
+  }, [setToken])
 
   useEffect(() => {
     fetchUsers();
@@ -47,7 +51,7 @@ const UserManagement = ({ setToken }) => {
         toast.success("User updated successfully! ✅", { style: toastStyle });
       } else {
         await createUser(formData);
-        toast.success("Signed In successfully! 🎉", { style: toastStyle });
+        toast.success("User Created successfully! 🎉", { style: toastStyle });
       }
       setFormData({ firstName: "", lastName: "", email: "", password: "" });
       setEditingUser(null);
@@ -83,9 +87,9 @@ const UserManagement = ({ setToken }) => {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    setToken(null);
+    sessionStorage.removeItem("token");
     navigate("/login");
+    console.log("naviagated")
   };
 
   const indexOfLastUser = currentPage * usersPerPage;
@@ -252,6 +256,10 @@ const UserManagement = ({ setToken }) => {
       )}
     </div>
   );
+};
+
+UserManagement.propTypes = {
+  setToken: PropTypes.func.isRequired,
 };
 
 export default UserManagement;

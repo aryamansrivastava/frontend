@@ -4,6 +4,7 @@ import axios from "axios";
 
 const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
+  const [user, setUser] = useState()
 
   useEffect(() => {
     const storedEmail = localStorage.getItem("signupEmail");
@@ -20,28 +21,43 @@ const Login = () => {
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    try {
-      const { data } = await axios.post("http://localhost:4000/login", form);
   
-      console.log("Login Response:", data); 
-  
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        
-        console.log("Token Stored:", localStorage.getItem("token")); 
-        
-        window.location.href = "/feed"; 
-      } else {
-        console.error("Token not received");
-      }
-    } catch (error) {
-      console.error("Login failed", error);
+  useEffect(() => {
+    let token = sessionStorage.getItem('token');
+    if (!token) {
+      return;
     }
-  };
+    console.log("auth token set")
+  }, [user]);
+
+
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+      
+      try {
+        const { data } = await axios.post("http://localhost:4000/login", form);
+    
+        console.log("Login Response:", data); 
+
+        setUser({
+          id: data.id,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          email: data.email,
+        })
+    
+        if (data.token) {
+          sessionStorage.setItem("token", data.token);
+          axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+          
+          window.location.href = "/feed"; 
+        } else {
+          console.error("Token not received");
+        }
+      } catch (error) {
+        console.error("Login failed", error);
+      }
+    };
   
 
   return (

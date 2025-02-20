@@ -1,10 +1,8 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:4000"; 
-
 export const createUser = async (userData) => {
   try {
-    const response = await axios.post(`${API_URL}/create`, userData);
+    const response = await axios.post(`${import.meta.env.VITE_API_URL}/create`, userData);
     return response.data; 
   } catch (err) {
     throw err.response?.data?.message || "Failed to create user"; 
@@ -12,17 +10,19 @@ export const createUser = async (userData) => {
 };
 
 export const getAllUsers = async () => {
-  return await axios.get(`${API_URL}/getallusers`);
+  console.log('Default Axios Headers:', axios.defaults.headers.common);
+
+  return await axios.get(`${import.meta.env.VITE_API_URL}/getallusers`);
 };
 
 export const getUserById = async (id) => {
-  return await axios.get(`${API_URL}/getuser/${id}`);
+  return await axios.get(`${import.meta.env.VITE_API_URL}/getuser/${id}`);
 };
 
 export const updateUser = async (id, userData) => {
-  return await axios.put(`${API_URL}/update/${id}`, userData);
+  return await axios.put(`${import.meta.env.VITE_API_URL}/update/${id}`, userData);
 };
 
 export const deleteUser = async (id) => {
-  return await axios.delete(`${API_URL}/delete/${id}`);
+  return await axios.delete(`${import.meta.env.VITE_API_URL}/delete/${id}`);
 };

@@ -3,13 +3,15 @@ import UserManagement from "./components/UserManagement";
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 function App() {
-  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [token, setToken] = useState()
 
   useEffect(() => {
-    setToken(localStorage.getItem("token"));
-  }, []); 
+    setToken(sessionStorage.getItem('token'))
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;  
+  }, [token])
 
   return (
     <Router>
