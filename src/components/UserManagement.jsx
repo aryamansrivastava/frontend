@@ -3,11 +3,11 @@ import { createUser, getAllUsers, deleteUser, updateUser } from "../api/api";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 const toastStyle = { userSelect: "none" };
 
-const UserManagement = ({setToken}) => {
+const UserManagement = ({ setToken }) => {
   const [users, setUsers] = useState([]);
   const [showUsers, setShowUsers] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
@@ -24,8 +24,8 @@ const UserManagement = ({setToken}) => {
   });
 
   useEffect(() => {
-    setToken(sessionStorage.getItem('token'))
-  }, [setToken])
+    setToken(sessionStorage.getItem("token"));
+  }, [setToken]);
 
   useEffect(() => {
     fetchUsers();
@@ -89,7 +89,7 @@ const UserManagement = ({setToken}) => {
   const handleLogout = () => {
     sessionStorage.removeItem("token");
     navigate("/login");
-    console.log("naviagated")
+    // console.log("naviagated");
   };
 
   const indexOfLastUser = currentPage * usersPerPage;
@@ -103,17 +103,16 @@ const UserManagement = ({setToken}) => {
       <ToastContainer position="top-right" autoClose={3000} />
 
       <div className="absolute top-5 right-5 flex flex-col items-end">
-  <div className="text-white font-semibold mb-1">
-    Welcome, {localStorage.getItem("loggedInUser")}
-  </div>
-  <button
-    onClick={handleLogout}
-    className="bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
-  >
-    Logout
-  </button>
-</div>
-
+        <div className="text-white font-semibold mb-1">
+          Welcome, {localStorage.getItem("loggedInUser")}
+        </div>
+        <button
+          onClick={handleLogout}
+          className="bg-red-500 p-2 rounded text-white hover:bg-red-600 transition duration-300 z-10"
+        >
+          Logout
+        </button>
+      </div>
 
       <h1 className="text-3xl font-bold mb-5 text-center">CRUD Sequelize</h1>
 

@@ -11,7 +11,6 @@ export const createUser = async (userData) => {
 
 export const getAllUsers = async () => {
   console.log('Default Axios Headers:', axios.defaults.headers.common);
-
   return await axios.get(`${import.meta.env.VITE_API_URL}/getallusers`);
 };
 

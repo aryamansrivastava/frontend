@@ -30,35 +30,33 @@ const Login = () => {
     console.log("auth token set")
   }, [user]);
 
-
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-      
-      try {
-        const { data } = await axios.post("http://localhost:4000/login", form);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-        console.log("Login Response:", data); 
-
-        setUser({
-          id: data.id,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          email: data.email,
-        })
-    
-        if (data.token) {
-          sessionStorage.setItem("token", data.token);
-          axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
-          
-          window.location.href = "/feed"; 
-        } else {
-          console.error("Token not received");
-        }
-      } catch (error) {
-        console.error("Login failed", error);
-      }
-    };
+    try {
+      const { data } = await axios.post("http://localhost:4000/login", form);
   
+      console.log("Login Response:", data); 
+
+      setUser({
+        id: data.id,
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+      })
+  
+      if (data.token) {
+        sessionStorage.setItem("token", data.token);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+        
+        window.location.href = "/feed"; 
+      } else {
+        console.error("Token not received");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
+    }
+  };
 
   return (
     <div className="min-h-screen flex justify-center items-center bg-gray-900 text-white py-8">
