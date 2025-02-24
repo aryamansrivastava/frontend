@@ -34,7 +34,7 @@ const Login = () => {
     e.preventDefault();
     
     try {
-      const { data } = await axios.post("http://localhost:4000/login", form);
+      const { data } = await axios.post(`${import.meta.env.VITE_API_URL}/login`, form);
   
       console.log("Login Response:", data); 
 
